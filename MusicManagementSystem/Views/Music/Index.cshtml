@@ -1,0 +1,41 @@
+﻿@model IEnumerable<MusicManagementSystem.Models.Music>
+
+@{
+    ViewBag.Title = "音乐列表";
+}
+
+<h2>音乐管理列表</h2>
+
+<p>
+    @Html.ActionLink("新增歌曲", "Create")
+</p>
+<table class="table table-bordered">
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.SongName)</th>
+        <th>@Html.DisplayNameFor(model => model.Singer)</th>
+        <th>@Html.DisplayNameFor(model => model.Album)</th>
+        <th>@Html.DisplayNameFor(model => model.ReleaseDate)</th>
+        <th>@Html.DisplayNameFor(model => model.NeteaseUrl)</th>
+        <th>操作</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.SongName)</td>
+            <td>@Html.DisplayFor(modelItem => item.Singer)</td>
+            <td>@Html.DisplayFor(modelItem => item.Album)</td>
+            <td>@Html.DisplayFor(modelItem => item.ReleaseDate)</td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.NeteaseUrl))
+                {
+                    <a href="@item.NeteaseUrl" target="_blank">点击跳转</a>
+                }
+            </td>
+            <td>
+                @Html.ActionLink("编辑", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("删除", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+</table>

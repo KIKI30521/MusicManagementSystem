@@ -1,0 +1,226 @@
+﻿@model MusicManagementSystem.Models.LoginViewModel
+
+@{
+    Layout = null; // 取消全局布局，独立页面
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页面</title> 
+    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <style>
+        /* 1. 全局样式：紫色主题 + 居中布局 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 2. 登录表单容器：紫色边框 + 阴影 */
+        .login-container {
+            width: 350px;
+            padding: 40px;
+            background-color: white;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1);
+        }
+
+        /* 3. 标题样式：紫色文字 */
+        .login-title {
+            text-align: center;
+            color: #9333ea; /* 文档紫色主题色 */
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        /* 4. 表单组样式：标签+输入框 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                color: #6b7280;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 12px 15px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 16px;
+                box-sizing: border-box; /* 防止输入框溢出 */
+            }
+
+                .form-group input:focus {
+                    outline: none;
+                    border-color: #9333ea; /* 聚焦时紫色边框 */
+                    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+                }
+
+        /* 5. 错误提示样式（表单验证失败） */
+        .validation-error {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* 6. 提交按钮样式：紫色背景 */
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #9333ea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .submit-btn:hover {
+                background-color: #7e22ce; /*  hover时加深紫色 */
+            }
+
+        /* 7. 弹窗样式：居中显示 + 半透明遮罩 */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 遮罩层 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none; /* 初始隐藏 */
+        }
+
+        .modal-content {
+            width: 300px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .modal-confirm-btn {
+            padding: 8px 20px;
+            background-color: #9333ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录表单容器 -->
+    <div class="login-container">
+        <h2 class="login-title">登录</h2> 
+        <!-- 登录表单：提交到Account/Login -->
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { role = "form" }))
+        {
+            @Html.AntiForgeryToken() <!-- 防CSRF攻击 -->
+
+            <!-- 账号输入框 -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.Username)
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Enter Username" })
+                @Html.ValidationMessageFor(m => m.Username, "", new { @class = "validation-error" })
+            </div>
+
+            <!-- 密码输入框 -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter Password" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "validation-error" })
+            </div>
+
+            <!-- 提交按钮 -->
+            <button type="submit" class="submit-btn">提交</button>
+        }
+    </div>
+
+    <!-- 登录结果弹窗（成功/失败通用） -->
+    <div class="modal-mask" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-message" id="modalMessage"></div>
+            <button class="modal-confirm-btn" id="modalConfirmBtn">确定</button>
+        </div>
+    </div>
+
+    <!-- 弹窗控制脚本 -->
+    <script>
+        $(function () {
+            // 1. 获取ViewBag传递的弹窗信息（登录成功/失败）
+            var message = "@Html.Raw(ViewBag.Message ?? "")";
+            var isSuccess = "@(ViewBag.IsSuccess ?? "false")" === "true";
+
+            // 2. 若有消息，显示弹窗
+            if (message) {
+                $("#modalMessage").text(message);
+                $("#loginModal").show();
+            }
+
+            // 3. 点击弹窗"确定"按钮的逻辑
+            $("#modalConfirmBtn").click(function () {
+                $("#loginModal").hide();
+                // 登录成功则跳转首页，失败则停留在登录页
+                if (isSuccess) {
+                    window.location.href = "@Url.Action("Index", "Music")";
+                }
+            });
+
+            // 4. 前端表单验证（确保输入合法后再提交）
+            $("form").submit(function () {
+                var username = $("#Username").val().trim();
+                var password = $("#Password").val().trim();
+                var isValid = true;
+
+                // 清空之前的错误提示
+                $(".validation-error").text("");
+
+                // 验证账号
+                if (!username) {
+                    $("#Username").next(".validation-error").text("请输入账号");
+                    isValid = false;
+                } else if (username.length < 3 || username.length > 20) {
+                    $("#Username").next(".validation-error").text("账号长度需3-20个字符");
+                    isValid = false;
+                }
+
+                // 验证密码
+                if (!password) {
+                    $("#Password").next(".validation-error").text("请输入密码");
+                    isValid = false;
+                } else if (password.length < 6 || password.length > 20) {
+                    $("#Password").next(".validation-error").text("密码长度需6-20个字符");
+                    isValid = false;
+                }
+
+                return isValid; // 验证通过才提交表单
+            });
+        });
+    </script>
+</body>
+</html>
