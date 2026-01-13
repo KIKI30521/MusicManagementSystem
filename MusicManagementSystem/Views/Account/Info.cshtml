@@ -1,0 +1,37 @@
+﻿@model IEnumerable<MusicManagementSystem.Models.AdminViewModel>
+@{
+    ViewBag.Title = "个人信息";
+    ViewBag.ActiveMenu = "PersonalInfo";
+}
+
+<div class="content-header">
+    <h2>个人信息</h2>
+    <div class="breadcrumbs">
+        管理员列表 <span>></span> 管理员
+    </div>
+</div>
+
+<div class="card">
+    <h3>管理员列表</h3>
+    <p style="color: #999; margin-bottom: 20px;">管理.个人</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>账号</th>
+                <th>密码</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var admin in Model)
+            {
+                <tr>
+                    <td>@admin.Id</td>
+                    <td>@admin.Username</td>
+                    <td>@admin.Password</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

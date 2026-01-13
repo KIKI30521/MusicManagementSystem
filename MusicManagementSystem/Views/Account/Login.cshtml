@@ -1,0 +1,134 @@
+﻿@model MusicManagementSystem.Models.LoginViewModel
+@{
+    Layout = null; // 登录页独立布局
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 音乐管理系统</title>
+    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <style>
+        /* 登录页样式*/
+        body {
+            background-color: #f9f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            color: #9333ea;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .logo i {
+                margin-right: 8px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                color: #666;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 12px 16px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+                .form-group input:focus {
+                    outline: none;
+                    border-color: #9333ea;
+                    box-shadow: 0 0 0 3px rgba(147,51,234,0.1);
+                }
+
+        .btn-purple {
+            width: 100%;
+            background-color: #9333ea;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+            .btn-purple:hover {
+                background-color: #7e22ce;
+            }
+
+        .text-danger {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .text-muted {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">
+            <i class="fa-solid fa-cubes"></i>
+            <span>登录</span>
+        </div>
+        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Username)
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn-purple">登录</button>
+        }
+    </div>
+</body>
+</html>

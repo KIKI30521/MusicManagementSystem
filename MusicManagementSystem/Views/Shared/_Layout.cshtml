@@ -1,0 +1,423 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - 音乐管理系统</title>
+    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9fc;
+            color: #333;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            height: 60px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #9333ea;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+            .logo i {
+                margin-right: 8px;
+            }
+
+        /* 头像下拉菜单 */
+        .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+            /* 增加容器点击区域，避免鼠标移开 */
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        /* 下拉菜单 */
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            width: 120px;
+            padding: 10px 0;
+            /* 默认隐藏 */
+            display: none;
+            /* 提高层级，避免被遮挡 */
+            z-index: 9999;
+            /* 防止菜单超出可视区域 */
+            overflow: visible;
+        }
+        /* 头像容器hover时，菜单显示 */
+        .avatar-wrapper:hover .dropdown-menu {
+            display: block;
+        }
+        /* 菜单自身hover时，强制保持显示（关键） */
+        .dropdown-menu:hover {
+            display: block !important;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 8px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 2px 0;
+            border-radius: 4px;
+        }
+
+            .dropdown-menu a:hover {
+                background-color: #f5f5f7;
+                /* 鼠标移到链接上时高亮 */
+                color: #9333ea;
+            }
+
+        .avatar-wrapper:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 220px;
+            background-color: #fff;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 60px;
+            left: 0;
+            bottom: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+            .sidebar-item.active {
+                background-color: #f5f0ff;
+                color: #9333ea;
+                border-left: 3px solid #9333ea;
+            }
+
+            .sidebar-item:hover {
+                background-color: #f9f9fc;
+            }
+
+            .sidebar-item i {
+                margin-right: 10px;
+                font-size: 16px;
+            }
+
+            .sidebar-item .badge {
+                margin-left: auto;
+                background-color: #22c55e;
+                color: #fff;
+                font-size: 12px;
+                padding: 2px 6px;
+                border-radius: 10px;
+            }
+
+        /* 右侧内容区 */
+        .content {
+            margin-left: 220px;
+            margin-top: 60px;
+            padding: 20px;
+            min-height: calc(100vh - 60px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+            .content-header h2 {
+                font-size: 20px;
+                color: #333;
+            }
+
+            .content-header .breadcrumbs {
+                font-size: 14px;
+                color: #999;
+            }
+
+                .content-header .breadcrumbs a {
+                    color: #9333ea;
+                    text-decoration: none;
+                }
+
+        /* 卡片容器 */
+        .card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                color: #666;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 12px 16px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
+
+                .form-group input:focus {
+                    outline: none;
+                    border-color: #9333ea;
+                    box-shadow: 0 0 0 3px rgba(147,51,234,0.1);
+                }
+
+        .btn-purple {
+            background-color: #9333ea;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .btn-purple:hover {
+                background-color: #7e22ce;
+            }
+
+        .btn-default {
+            background-color: #f5f5f7;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* 表格样式 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+            .table th, .table td {
+                padding: 16px;
+                text-align: left;
+                border-bottom: 1px solid #f5f5f7;
+            }
+
+            .table th {
+                color: #999;
+                font-weight: 500;
+            }
+
+            .table td img {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                object-fit: cover;
+            }
+
+        /* 音频控件样式 */
+        .audio-player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .audio-player button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #9333ea;
+            }
+
+            .audio-player progress {
+                flex: 1;
+                height: 6px;
+                border-radius: 3px;
+                background-color: #f5f5f7;
+                border: none;
+            }
+
+                .audio-player progress::-webkit-progress-value {
+                    background-color: #9333ea;
+                    border-radius: 3px;
+                }
+
+            .audio-player .time {
+                font-size: 12px;
+                color: #999;
+            }
+
+            .audio-player .volume {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #666;
+            }
+
+        /* 操作按钮 */
+        .btn-edit {
+            background-color: #f5f0ff;
+            color: #9333ea;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: #ffebee;
+            color: #ef4444;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div class="logo">
+            <i class="fa-solid fa-cubes"></i>
+            <span>音乐管理系统</span>
+        </div>
+        <div class="avatar-wrapper">
+            <img src="~/Images/avatar.jpg" class="avatar" alt="管理员头像">
+            <div class="dropdown-menu">
+                <a href="@Url.Action("Logout", "Account")">
+                    <i class="fa-solid fa-sign-out"></i> 退出
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 左侧侧边栏 -->
+    <div class="sidebar">
+        <a href="@Url.Action("Index", "Music")" class="sidebar-item @(ViewBag.ActiveMenu == "Preview" ? "active" : "")">
+            <i class="fa-solid fa-house"></i>
+            <span>预览</span>
+            <span class="badge">Home</span>
+        </a>
+        <a href="@Url.Action("Create", "Music")" class="sidebar-item @(ViewBag.ActiveMenu == "AddMusic" ? "active" : "")">
+            <i class="fa-solid fa-music"></i>
+            <span>添加歌曲</span>
+        </a>
+        <a href="@Url.Action("Info", "Account")" class="sidebar-item @(ViewBag.ActiveMenu == "PersonalInfo" ? "active" : "")">
+            <i class="fa-solid fa-user"></i>
+            <span>个人信息</span>
+        </a>
+    </div>
+
+    <!-- 右侧内容区 -->
+    <div class="content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p style="text-align:center;color:lightgrey">&copy;@DateTime.Now.Year - 计科2311 16 彭姿淇</p>
+        </footer>
+    </div>
+
+    <script>
+        // 音频播放控制逻辑
+        $(function () {
+            // 音频播放/暂停切换
+            $('.audio-player button:first').click(function () {
+                const audio = $(this).siblings('audio')[0];
+                const progressBar = $(this).siblings('progress');
+                const timeDisplay = $(this).siblings('.time');
+
+                if (audio.paused) {
+                    audio.play();
+                    $(this).html('<i class="fa-solid fa-pause"></i>');
+                    // 实时更新进度条
+                    audio.addEventListener('timeupdate', function () {
+                        const percent = (audio.currentTime / audio.duration) * 100;
+                        progressBar.val(percent);
+                        // 格式化时间
+                        const currentTime = formatTime(audio.currentTime);
+                        const duration = formatTime(audio.duration);
+                        timeDisplay.text(`${currentTime} / ${duration}`);
+                    });
+                } else {
+                    audio.pause();
+                    $(this).html('<i class="fa-solid fa-play"></i>');
+                }
+            });
+
+            // 音量控制（简单切换静音）
+            $('.audio-player .volume').click(function () {
+                const audio = $(this).siblings('audio')[0];
+                audio.muted = !audio.muted;
+                $(this).html(audio.muted ? '<i class="fa-solid fa-volume-mute"></i>' : '<i class="fa-solid fa-volume-high"></i>');
+            });
+
+            // 时间格式化函数（秒转 分:秒）
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<MusicManagementSystem.Models.MusicWithSerialViewModel>
+@{
+    ViewBag.Title = "详细数据";
+    ViewBag.ActiveMenu = "Preview";
+}
+
+<div class="content-header">
+    <h2>详细数据</h2>
+    <div class="breadcrumbs">
+        概述 <span>></span> 详细数据
+    </div>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th> 
+                <th>名称</th>
+                <th>图片</th>
+                <th>音源ID</th>
+                <th>音源</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.SerialNumber</td>
+                    <td>@item.SongName</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.SongName">
+                        }
+                        else
+                        {
+                            <img src="https://picsum.photos/40/40" alt="默认图片">
+                        }
+                    </td>
+                    <td>@item.MusicSourceId</td>
+                    <td>
+                        <div class="audio-player">
+                            <button><i class="fa-solid fa-play"></i></button> <!-- 修正：多余的<已删除，button标签闭合 -->
+                            <audio src="@item.MusicUrl" preload="none">您的浏览器不支持音频播放</audio>
+                            <progress value="0" max="100"></progress>
+                            <span class="time">0:00 / 0:00</span>
+                            <button class="volume"><i class="fa-solid fa-volume-high"></i></button> <!-- 修正：多余的<已删除，button标签闭合 -->
+                        </div>
+                    </td>
+                    <td>
+                        <!-- 编辑/删除使用数据库真实Id，button标签闭合 -->
+                        <button class="btn-edit" onclick="location.href='@Url.Action("Edit", "Music", new { id = item.Id })'">编辑</button>
+                        <button class="btn-delete" onclick="if(confirm('确定删除吗？')) location.href='@Url.Action("Delete", "Music", new { id = item.Id })'">删除</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

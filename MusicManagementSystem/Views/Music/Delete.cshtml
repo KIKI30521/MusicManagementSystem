@@ -1,0 +1,24 @@
+﻿@model MusicManagementSystem.Models.Music
+@{
+    ViewBag.Title = "删除歌曲";
+    ViewBag.ActiveMenu = "Preview";
+}
+
+<div class="content-header">
+    <h2>删除歌曲</h2>
+    <div class="breadcrumbs">
+        概述 <span>></span> 删除歌曲
+    </div>
+</div>
+
+<div class="card">
+    <h3>确认删除</h3>
+    <p style="color: #ef4444; margin-bottom: 20px;">您确定要删除歌曲「@Model.SongName」吗？此操作不可恢复！</p>
+
+    @using (Html.BeginForm("Delete", "Music", new { id = Model.Id }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn-purple" style="background-color: #ef4444;">确认删除</button>
+        <button type="button" class="btn-default" onclick="location.href='@Url.Action("Index", "Music")'">取消</button>
+    }
+</div>

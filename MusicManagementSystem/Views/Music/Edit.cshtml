@@ -1,0 +1,54 @@
+﻿@model MusicManagementSystem.Models.Music
+@{
+    ViewBag.Title = "编辑歌曲";
+    ViewBag.ActiveMenu = "Preview";
+}
+
+<div class="content-header">
+    <h2>编辑歌曲</h2>
+    <div class="breadcrumbs">
+        概述 <span>></span> 编辑歌曲
+    </div>
+</div>
+
+<div class="card">
+    <h3>编辑歌曲</h3>
+    <p style="color: #999; margin-bottom: 20px;">Edit Music</p>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @Html.HiddenFor(m => m.Id) <!-- 隐藏ID，确保修改对应歌曲 -->
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.SongName)
+            @Html.TextBoxFor(m => m.SongName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.SongName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ImageUrl)
+            @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.ImageUrl, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.MusicUrl)
+            @Html.TextBoxFor(m => m.MusicUrl, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.MusicUrl, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.MusicSourceId)
+            @Html.TextBoxFor(m => m.MusicSourceId, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.MusicSourceId, "", new { @class = "text-danger" })
+        </div>
+
+        <div>
+            <button type="submit" class="btn-purple">保存修改</button>
+            <button type="button" class="btn-default" onclick="location.href='@Url.Action("Index", "Music")'">取消</button>
+        </div>
+    }
+</div>
