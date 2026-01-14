@@ -55,6 +55,7 @@ namespace MusicManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model, string returnUrl)
         {
+            // 第一步：验证表单输入合法性（前端验证不通过时，返回登录页）
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -79,7 +80,7 @@ namespace MusicManagementSystem.Controllers
                 ModelState.AddModelError("", "账号或密码错误（默认：admin/123456）");
                 return View(model);
             }
-        }
+            }
 
         // 个人信息页
         public ActionResult Info()

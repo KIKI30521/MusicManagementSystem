@@ -1,4 +1,5 @@
 ﻿@model MusicManagementSystem.Models.LoginViewModel
+
 @{
     Layout = null; // 登录页独立布局
 }
@@ -53,6 +54,7 @@
 
             .form-group label {
                 display: block;
+                color: #6b7280;
                 margin-bottom: 8px;
                 font-size: 14px;
                 color: #666;
@@ -74,6 +76,7 @@
 
         .btn-purple {
             width: 100%;
+            padding: 12px;
             background-color: #9333ea;
             color: #fff;
             border: none;
@@ -115,12 +118,14 @@
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
+            <!-- 账号输入框 -->
             <div class="form-group">
                 @Html.LabelFor(m => m.Username)
                 @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
             </div>
 
+            <!-- 密码输入框 -->
             <div class="form-group">
                 @Html.LabelFor(m => m.Password)
                 @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
@@ -130,5 +135,67 @@
             <button type="submit" class="btn-purple">登录</button>
         }
     </div>
+
+    <!-- 登录结果弹窗（成功/失败通用） -->
+    <div class="modal-mask" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-message" id="modalMessage"></div>
+            <button class="modal-confirm-btn" id="modalConfirmBtn">确定</button>
+        </div>
+    </div>
+
+    <!-- 弹窗控制脚本 -->
+    <script>
+        $(function () {
+            // 1. 获取ViewBag传递的弹窗信息（登录成功/失败）
+            var message = "@Html.Raw(ViewBag.Message ?? "")";
+            var isSuccess = "@(ViewBag.IsSuccess ?? "false")" === "true";
+
+            // 2. 若有消息，显示弹窗
+            if (message) {
+                $("#modalMessage").text(message);
+                $("#loginModal").show();
+            }
+
+            // 3. 点击弹窗"确定"按钮的逻辑
+            $("#modalConfirmBtn").click(function () {
+                $("#loginModal").hide();
+                // 登录成功则跳转首页，失败则停留在登录页
+                if (isSuccess) {
+                    window.location.href = "@Url.Action("Index", "Music")";
+                }
+            });
+
+            // 4. 前端表单验证（确保输入合法后再提交）
+            $("form").submit(function () {
+                var username = $("#Username").val().trim();
+                var password = $("#Password").val().trim();
+                var isValid = true;
+
+                // 清空之前的错误提示
+                $(".validation-error").text("");
+
+                // 验证账号
+                if (!username) {
+                    $("#Username").next(".validation-error").text("请输入账号");
+                    isValid = false;
+                } else if (username.length < 3 || username.length > 20) {
+                    $("#Username").next(".validation-error").text("账号长度需3-20个字符");
+                    isValid = false;
+                }
+
+                // 验证密码
+                if (!password) {
+                    $("#Password").next(".validation-error").text("请输入密码");
+                    isValid = false;
+                } else if (password.length < 6 || password.length > 20) {
+                    $("#Password").next(".validation-error").text("密码长度需6-20个字符");
+                    isValid = false;
+                }
+
+                return isValid; // 验证通过才提交表单
+            });
+        });
+    </script>
 </body>
 </html>
